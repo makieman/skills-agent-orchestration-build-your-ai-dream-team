@@ -4,7 +4,7 @@
 
 <img src="https://octodex.github.com/images/welcometocat.png" height="200px" />
 
-### 🌟 You've successfully completed 🌟
+### 🌟 You've successfully complited skills-agent-orchestration-build-your-ai-dream-team🌟
 
 ## 🚀 Share Your Success!
 
