@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Pulse</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="dashboard">
+    <header class="dashboard__header">
+      <div>
+        <p class="dashboard__eyebrow">Team project snapshot</p>
+        <h1>Project Pulse</h1>
+        <p class="dashboard__summary">Track ownership, status, recent activity, and priority at a glance.</p>
+      </div>
+      <p class="dashboard__count" id="project-count">Loading projects…</p>
+    </header>
+
+    <section class="project-grid" id="project-grid" aria-labelledby="projects-heading" aria-live="polite" aria-busy="true">
+      <h2 class="sr-only" id="projects-heading">Projects</h2>
+    </section>
+  </main>
+
+  <script>
+    const grid = document.getElementById('project-grid');
+    const projectCount = document.getElementById('project-count');
+    const PROJECT_DATA_URL = './project-data.json';
+
+    function getText(value, fallback = 'Not set') {
+      if (typeof value !== 'string') {
+        return fallback;
+      }
+
+      const trimmedValue = value.trim();
+      return trimmedValue ? trimmedValue : fallback;
+    }
+
+    function toVariantToken(value) {
+      const safeValue = getText(value, 'unknown').toLowerCase();
+      return safeValue.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'unknown';
+    }
+
+    function createLabel(text, className, variantToken) {
+      const span = document.createElement('span');
+      span.className = variantToken ? `${className} ${className}--${variantToken}` : className;
+      span.textContent = text;
+      return span;
+    }
+
+    function createDetail(label, value, valueClass, detailClass) {
+      const wrapper = document.createElement('div');
+      wrapper.className = detailClass ? `project-card__detail ${detailClass}` : 'project-card__detail';
+
+      const term = document.createElement('dt');
+      term.textContent = label;
+
+      const description = document.createElement('dd');
+      if (valueClass) {
+        description.appendChild(createLabel(getText(value), valueClass, toVariantToken(value)));
+      } else {
+        description.textContent = getText(value);
+      }
+
+      wrapper.append(term, description);
+      return wrapper;
+    }
+
+    function renderFallback(message) {
+      grid.innerHTML = '';
+      const emptyState = document.createElement('article');
+      emptyState.className = 'project-card project-card--empty';
+      emptyState.textContent = message;
+      grid.appendChild(emptyState);
+      grid.setAttribute('aria-busy', 'false');
+      projectCount.textContent = message;
+    }
+
+    function renderProjects(projects) {
+      grid.innerHTML = '';
+
+      projects.forEach((project) => {
+        const card = document.createElement('article');
+        card.className = 'project-card';
+
+        const titleRow = document.createElement('div');
+        titleRow.className = 'project-card__title-row';
+
+        const heading = document.createElement('h2');
+        heading.textContent = getText(project.name);
+
+        titleRow.appendChild(heading);
+        titleRow.appendChild(createLabel(getText(project.status), 'project-card__status', toVariantToken(project.status)));
+
+        const owner = document.createElement('p');
+        owner.className = 'project-card__owner';
+        owner.textContent = `Owner: ${getText(project.owner)}`;
+
+        const details = document.createElement('dl');
+        details.className = 'project-card__details';
+        details.append(
+          createDetail('Recent activity', project.recentActivity, '', 'project-card__detail--activity'),
+          createDetail('Priority', project.priority, 'project-card__priority')
+        );
+
+        card.append(titleRow, owner, details);
+        grid.appendChild(card);
+      });
+
+      grid.setAttribute('aria-busy', 'false');
+      projectCount.textContent = `${projects.length} projects`;
+    }
+
+    fetch(PROJECT_DATA_URL)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to load project data (${response.status})`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        const projects = Array.isArray(data.projects) ? data.projects : [];
+
+        if (projects.length === 0) {
+          renderFallback('No projects available.');
+          return;
+        }
+
+        renderProjects(projects);
+      })
+      .catch((error) => {
+        console.error(error);
+        renderFallback('Project data could not be loaded.');
+      });
+  </script>
+</body>
+</html>

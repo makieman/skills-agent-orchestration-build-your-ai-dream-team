@@ -1,0 +1,32 @@
+{
+  "projects": [
+    {
+      "name": "Apollo Release Track",
+      "owner": "Ava Chen",
+      "status": "In progress",
+      "recentActivity": "Completed QA handoff and updated the release checklist.",
+      "priority": "High"
+    },
+    {
+      "name": "Beacon Analytics Refresh",
+      "owner": "Noah Patel",
+      "status": "Blocked",
+      "recentActivity": "Waiting on an API schema decision before implementation can continue.",
+      "priority": "Critical"
+    },
+    {
+      "name": "Compass Onboarding",
+      "owner": "Mia Rivera",
+      "status": "Ready",
+      "recentActivity": "Final copy edits were approved and the rollout plan is ready.",
+      "priority": "Medium"
+    },
+    {
+      "name": "Delta Infrastructure Audit",
+      "owner": "Liam Brooks",
+      "status": "Monitoring",
+      "recentActivity": "Collected service metrics and flagged two follow-up actions.",
+      "priority": "Low"
+    }
+  ]
+}
